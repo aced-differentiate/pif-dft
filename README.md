@@ -2,7 +2,7 @@ dfttopif
 ========
 [![Build Status](https://travis-ci.org/CitrineInformatics/pif-dft.svg?branch=master)](https://travis-ci.org/CitrineInformatics/pif-dft)
 
-A Python library for extracting the input settings and results from Density Functional Theory calculations, and then storing that data in pif format.
+A Python library for extracting the input settings and results from Density Functional Theory calculations, and then storing that data in pif format. Currently supported codes (PWSCF,VASP,GPAW,ABINIT)
 
 Requirements
 ------------
