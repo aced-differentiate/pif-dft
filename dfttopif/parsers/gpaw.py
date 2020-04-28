@@ -5,6 +5,7 @@ import os
 from pypif.obj.common.value import Value
 
 from ase import Atoms
+from ase.io import read
 
 class GpawParser(DFTParser):
     '''
@@ -15,21 +16,37 @@ class GpawParser(DFTParser):
         self.settings = {}
         self.all_parsed_data = {}
 
-    # Look for appropriate files
-        self.outputf = None
-        for f in self._files:
-            try:
-                if self._get_line('gpaw', f, return_string=False, case_sens=False):
-                    if self.outputf is not None:
-                        raise InvalidIngesterException('More than one output file!')
-                    self.outputf = f
-            except UnicodeDecodeError as e:
-                pass
+    # Look for ase traj files
+        def _find_traj():
+            traj_file = None
+            for f in self._files:
+                if os.path.basename(f).split('.')[-1] == 'traj':
+                    try:
+                        test_traj_file = read(f, format='traj')
+                        if traj_file is not None:
+                            raise InvalidIngesterException('Found more than one valid traj file')
+                        traj_file = f
+            return traj_file
 
+        self.outputf = _find_traj()
+
+
+
+    # Look for appropriate txt if no traj files
         if self.outputf is None:
-            raise InvalidIngesterException('Failed to find output file')
+            for f in self._files:
+                try:
+                    if self._get_line('gpaw', f, return_string=False, case_sens=False):
+                        if self.outputf is not None:
+                            raise InvalidIngesterException('More than one output file!')
+                        self.outputf = f
+                except UnicodeDecodeError as e:
+                    pass
 
-     # Reads each output file into a text file and writes it to a ase database
+            if self.outputf is None:
+                raise InvalidIngesterException('Failed to find output file')
+
+    atoms = read(self.outputf)
 
     def get_name(self): return "GPAW"
 
