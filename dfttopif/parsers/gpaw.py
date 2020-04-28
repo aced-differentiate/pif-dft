@@ -21,13 +21,10 @@ class GpawParser(DFTParser):
             traj_file = None
             for f in self._files:
                 if os.path.basename(f).split('.')[-1] == 'traj':
-                    try:
-                        test_traj_file = read(f, format='traj')
-                        if traj_file is not None:
-                            raise InvalidIngesterException('Found more than one valid traj file')
-                        traj_file = f
-                    except:
-                        pass
+                    test_traj_file = read(f, format='traj')
+                    if traj_file is not None:
+                        raise InvalidIngesterException('Found more than one valid traj file')
+                    traj_file = f
             return traj_file
 
         self.outputf = _find_traj()
