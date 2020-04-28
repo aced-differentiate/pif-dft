@@ -26,6 +26,8 @@ class GpawParser(DFTParser):
                         if traj_file is not None:
                             raise InvalidIngesterException('Found more than one valid traj file')
                         traj_file = f
+                    except:
+                        pass
             return traj_file
 
         self.outputf = _find_traj()
