@@ -29,6 +29,8 @@ class GpawParser(DFTParser):
                         traj_file = f
                     except InvalidULMFileError:
                         pass
+                    except OSError:
+                        pass
             return traj_file
 
         self.outputf = _find_traj()
