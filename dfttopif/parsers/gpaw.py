@@ -64,6 +64,10 @@ class GpawParser(DFTParser):
         return Property(scalars=[Scalar(value=ener)], units='eV')
 
 
+    def get_xc_functional(self):
+        xc = temp_db.get(id=1).calculator_parameters['xc']
+        return Value(scalars=[Scalar(value=xc)])
+
     def get_name(self): return "GPAW"
 
     def _get_line(self, search_string, search_file, return_string=True, case_sens=True):
