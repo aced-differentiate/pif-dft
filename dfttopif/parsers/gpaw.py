@@ -64,6 +64,10 @@ class GpawParser(DFTParser):
         ener = temp_db.get(id=1).energy
         return Property(scalars=[Scalar(value=ener)], units='eV')
 
+    def get_grid_spacing(self):
+        '''Determine grid spacing from the temporary ase db'''
+        h = temp_db.get(id=1).calculator_parameters['h']
+        return Value(scalars=[Scalar(value=h)],units='A')
 
     def get_xc_functional(self):
         '''Determine the xc functional from the temporary ase db'''
