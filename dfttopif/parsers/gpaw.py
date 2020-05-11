@@ -7,6 +7,7 @@ from pypif.obj.common.value import Value
 from ase import Atoms
 from ase.io import read
 from ase.io.ulm import InvalidULMFileError
+import ase.db
 
 class GpawParser(DFTParser):
     '''
@@ -51,7 +52,15 @@ class GpawParser(DFTParser):
             if self.outputf is None:
                 raise InvalidIngesterException('Failed to find output file')
 
+    # Use ase db functionality to read in data
     atoms = read(self.outputf)
+    temp_db = ase.db.connect('temp_db.db')
+    temp_db.write(atoms)
+
+    def get_total_energy(self):
+        ener = temp_db.get(id=1).energy
+        return Property(scalars=[Scalar(value=ener)], units='eV')
+
 
     def get_name(self): return "GPAW"
 
