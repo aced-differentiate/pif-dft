@@ -35,6 +35,7 @@ class GpawParser(DFTParser):
             return traj_file
 
         self.outputf = _find_traj()
+        self.output_type = 'traj'
 
 
 
@@ -51,6 +52,7 @@ class GpawParser(DFTParser):
 
             if self.outputf is None:
                 raise InvalidIngesterException('Failed to find output file')
+            self.output_type='txt'
 
     # Use ase db functionality to read in data
     atoms = read(self.outputf)
