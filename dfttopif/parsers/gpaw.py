@@ -76,6 +76,16 @@ class GpawParser(DFTParser):
 
     def get_name(self): return "GPAW"
 
+    def get_outcar(self):
+        return None
+
+    def get_incar(self):
+        return None
+
+    def get_poscar(self):
+        return None
+
+
     def _get_line(self, search_string, search_file, return_string=True, case_sens=True):
         '''Return the first line containing a set of strings in a file.
 
