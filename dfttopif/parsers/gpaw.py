@@ -60,11 +60,13 @@ class GpawParser(DFTParser):
     temp_db.write(atoms)
 
     def get_total_energy(self):
+        '''Determine total energy from the temporary ase db'''
         ener = temp_db.get(id=1).energy
         return Property(scalars=[Scalar(value=ener)], units='eV')
 
 
     def get_xc_functional(self):
+        '''Determine the xc functional from the temporary ase db'''
         xc = temp_db.get(id=1).calculator_parameters['xc']
         return Value(scalars=[Scalar(value=xc)])
 
