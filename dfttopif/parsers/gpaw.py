@@ -50,8 +50,10 @@ class GpawParser(DFTParser):
                 except UnicodeDecodeError as e:
                     pass
 
+            # If still cannot find GPAW outputfile, raise exception
             if self.outputf is None:
                 raise InvalidIngesterException('Failed to find output file')
+
             self.output_type='txt'
 
         # Use ase db functionality to read in data to temporary ase db
@@ -63,19 +65,40 @@ class GpawParser(DFTParser):
 
         self.temp_db = _write_temp_asedb()
 
+        # Get mode for calculation
+        self.calc_mode = get_mode()
+
 
     def get_total_energy(self):
         '''Determine total energy from the temporary ase db'''
         ener = self.temp_db.get(id=1).energy
         return Property(scalars=[Scalar(value=ener)], units='eV')
 
-    def get_grid_spacing(self):
-        '''Determine grid spacing from the temporary ase db'''
+    def get_mode(self):
+        '''Determine calculation mode used.
+
+        Possibilities are 'fd' (finite difference real space grid), 'lcao', 'pw' (plane-wave)
+
+        '''
         try:
-            h = self.temp_db.get(id=1).calculator_parameters['h']
+            mode=self.temp_db.get(id=1).calculator_parameters['mode']['name']
         except KeyError:
-            h = 0.2
-        return Value(scalars=[Scalar(value=h)],units='A')
+            mode = 'fd'
+        return mode
+
+    def get_grid_spacing(self):
+        '''Determine grid spacing from the temporary ase db
+
+        Returns None if the calculator mode was not 'fd'
+
+        '''
+        if self.calc_mode == 'fd':
+            try:
+                h = self.temp_db.get(id=1).calculator_parameters['h']
+            except KeyError:
+                h = 0.2
+            return Value(scalars=[Scalar(value=h)],units='A')
+        return None
 
     def get_xc_functional(self):
         '''Determine the xc functional from the temporary ase db'''
