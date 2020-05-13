@@ -74,7 +74,10 @@ class GpawParser(DFTParser):
 
     def get_xc_functional(self):
         '''Determine the xc functional from the temporary ase db'''
-        xc = temp_db.get(id=1).calculator_parameters['xc']
+        try:
+            xc = temp_db.get(id=1).calculator_parameters['xc']
+        except KeyError:
+            xc = 'LDA'
         return Value(scalars=[Scalar(value=xc)])
 
     def get_name(self): return "GPAW"
