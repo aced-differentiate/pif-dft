@@ -20,6 +20,7 @@ class GpawParser(DFTParser):
 
     # Look for ase traj files
         def _find_traj():
+            '''Searches for GPAW readable traj file and returns name '''
             traj_file = None
             for f in self._files:
                 if os.path.basename(f).split('.')[-1] == 'traj':
@@ -58,6 +59,7 @@ class GpawParser(DFTParser):
 
         # Use ase db functionality to read in data to temporary ase db
         def _write_temp_asedb(self):
+            '''Reads designated output file and writes it to a temporary ase db '''
             atoms = read(self.outputf)
             temp_db = ase.db.connect('temp_db.db')
             temp_db.write(atoms)
@@ -77,7 +79,8 @@ class GpawParser(DFTParser):
     def get_mode(self):
         '''Determine calculation mode used.
 
-        Possibilities are 'fd' (finite difference real space grid), 'lcao', 'pw' (plane-wave)
+        Returns:
+           String, Possibilities are 'fd' (finite difference real space grid), 'lcao', 'pw' (plane-wave)
 
         '''
         try:
@@ -89,7 +92,7 @@ class GpawParser(DFTParser):
     def get_grid_spacing(self):
         '''Determine grid spacing from the temporary ase db
 
-        Returns None if the calculator mode was not 'fd'
+        Returns: Value, None if the calculator mode was not 'fd'
 
         '''
         if self.calc_mode == 'fd':
@@ -107,6 +110,16 @@ class GpawParser(DFTParser):
         except KeyError:
             xc = 'LDA'
         return Value(scalars=[Scalar(value=xc)])
+
+    def get_cutoff_energy(self):
+        '''Determine cutoff energy if calc mode is plane wave, else returns None'''
+        if self.calc_mode == 'pw':
+            try:
+                ecut = self.temp_db.get(id=1).calculator_parameters['mode']['ecut']
+            except KeyError:
+                ecut = 340.0
+            return Value(scalars=[Scalar(value=ecut)],units='eV')
+        return None
 
     def get_name(self): return "GPAW"
 
