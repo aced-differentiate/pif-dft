@@ -54,20 +54,25 @@ class GpawParser(DFTParser):
                 raise InvalidIngesterException('Failed to find output file')
             self.output_type='txt'
 
-    # Use ase db functionality to read in data
-    atoms = read(self.outputf)
-    temp_db = ase.db.connect('temp_db.db')
-    temp_db.write(atoms)
+        # Use ase db functionality to read in data to temporary ase db
+        def _write_temp_asedb(self):
+            atoms = read(self.outputf)
+            temp_db = ase.db.connect('temp_db.db')
+            temp_db.write(atoms)
+            return temp_db
+
+        self.temp_db = _write_temp_asedb()
+
 
     def get_total_energy(self):
         '''Determine total energy from the temporary ase db'''
-        ener = temp_db.get(id=1).energy
+        ener = self.temp_db.get(id=1).energy
         return Property(scalars=[Scalar(value=ener)], units='eV')
 
     def get_grid_spacing(self):
         '''Determine grid spacing from the temporary ase db'''
         try:
-            h = temp_db.get(id=1).calculator_parameters['h']
+            h = self.temp_db.get(id=1).calculator_parameters['h']
         except KeyError:
             h = 0.2
         return Value(scalars=[Scalar(value=h)],units='A')
@@ -75,7 +80,7 @@ class GpawParser(DFTParser):
     def get_xc_functional(self):
         '''Determine the xc functional from the temporary ase db'''
         try:
-            xc = temp_db.get(id=1).calculator_parameters['xc']
+            xc = self.temp_db.get(id=1).calculator_parameters['xc']
         except KeyError:
             xc = 'LDA'
         return Value(scalars=[Scalar(value=xc)])
