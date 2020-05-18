@@ -79,6 +79,9 @@ class GpawParser(DFTParser):
     def get_mode(self):
         '''Determine calculation mode used.
 
+        Default value pulled from https://wiki.fysik.dtu.dk/gpaw/documentation/manual.html on May 18, 2020
+
+
         Returns:
            String, Possibilities are 'fd' (finite difference real space grid), 'lcao', 'pw' (plane-wave)
 
@@ -92,6 +95,8 @@ class GpawParser(DFTParser):
     def get_grid_spacing(self):
         '''Determine grid spacing from the temporary ase db
 
+        Default value pulled from https://wiki.fysik.dtu.dk/gpaw/documentation/manual.html on May 18, 2020
+
         Returns: Value, None if the calculator mode was not 'fd'
 
         '''
@@ -100,11 +105,15 @@ class GpawParser(DFTParser):
                 h = self.temp_db.get(id=1).calculator_parameters['h']
             except KeyError:
                 h = 0.2
-            return Value(scalars=[Scalar(value=h)],units='A')
+            return Value(scalars=[Scalar(value=h)],units='angstrom')
         return None
 
     def get_xc_functional(self):
-        '''Determine the xc functional from the temporary ase db'''
+        '''Determine the xc functional from the temporary ase db
+
+        Default value pulled from https://wiki.fysik.dtu.dk/gpaw/documentation/manual.html on May 18, 2020
+
+        '''
         try:
             xc = self.temp_db.get(id=1).calculator_parameters['xc']
         except KeyError:
@@ -112,7 +121,11 @@ class GpawParser(DFTParser):
         return Value(scalars=[Scalar(value=xc)])
 
     def get_cutoff_energy(self):
-        '''Determine cutoff energy if calc mode is plane wave, else returns None'''
+        '''Determine cutoff energy if calc mode is plane wave, else returns None
+
+        Default value pulled from https://wiki.fysik.dtu.dk/gpaw/documentation/manual.html on May 18, 2020
+
+        '''
         if self.calc_mode == 'pw':
             try:
                 ecut = self.temp_db.get(id=1).calculator_parameters['mode']['ecut']
