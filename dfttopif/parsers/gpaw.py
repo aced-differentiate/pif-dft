@@ -134,6 +134,19 @@ class GpawParser(DFTParser):
             return Value(scalars=[Scalar(value=ecut)],units='eV')
         return None
 
+    def get_KPPRA(self):
+        ''' Determine the no. of k-points in the BZ times the no. of atoms
+
+        Default value pulled from https://wiki.fysik.dtu.dk/gpaw/documentation/manual.html on May 18, 2020
+
+        '''
+        try:
+            kp = self.temp_db.get(id=1).calculator_parameters['kpts']
+        except KeyError:
+            kp = np.array([0.])
+        natoms = self.temp_db.get(id=1).natoms
+        return kp.prod()*natoms
+
     def get_name(self): return "GPAW"
 
     def get_outcar(self):
