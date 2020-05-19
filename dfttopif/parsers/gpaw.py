@@ -147,6 +147,19 @@ class GpawParser(DFTParser):
         natoms = self.temp_db.get(id=1).natoms
         return Value(scalars=[Scalar(value=kp.prod()*natoms)])
 
+    def get_total_magnetization(self):
+        try:
+            spin = self.temp_db.get(id=1).calculator_parameters['spinpol']
+        except KeyError:
+            return None
+        if spin:
+            try:
+                tot_mag = self.temp_db.get(id=1).magmom
+            except KeyError:
+                return None
+            return Property(scalars=[Scalar(value=tot_mag)],units='Bohr')
+        return None
+
     def get_name(self): return "GPAW"
 
     def get_outcar(self):
