@@ -145,7 +145,7 @@ class GpawParser(DFTParser):
         except KeyError:
             kp = np.array([0.])
         natoms = self.temp_db.get(id=1).natoms
-        return kp.prod()*natoms
+        return Value(scalars=[Scalar(value=kp.prod()*natoms)])
 
     def get_name(self): return "GPAW"
 
