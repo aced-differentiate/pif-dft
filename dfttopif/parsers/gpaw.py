@@ -160,6 +160,16 @@ class GpawParser(DFTParser):
             return Property(scalars=[Scalar(value=tot_mag)],units='Bohr')
         return None
 
+    def get_output_structure(self):
+        ''' Returns ase Atoms object containing only symbols, cell, pbc, and coordinates'''
+        sym = self.temp_db.get(id=1).symbols
+        cell = self.temp_db.get(id=1).cell
+        pbc = self.temp_db.get(id=1).pbc
+        coords = self.temp_db.get(id=1).positions
+        struct = Atoms(symbols=sym,cell=cell,pbc=pbc)
+        struct.set_positions(coords)
+        return struct
+
     def get_name(self): return "GPAW"
 
     def get_outcar(self):
