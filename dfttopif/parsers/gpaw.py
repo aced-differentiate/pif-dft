@@ -16,7 +16,7 @@ class GpawParser(DFTParser):
     def __init__(self, files):
         super(GpawParser, self).__init__(files)
 
-    # Look for ase traj files
+        # Look for ase traj files
         def _find_traj():
             '''Searches for GPAW readable traj file and returns name '''
             traj_file = None
@@ -38,7 +38,7 @@ class GpawParser(DFTParser):
 
 
 
-    # Look for appropriate txt if no traj files
+        # Look for appropriate txt if no traj files
         if self.outputf is None:
             for f in self._files:
                 try:

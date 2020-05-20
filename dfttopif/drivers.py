@@ -4,6 +4,7 @@ import tarfile
 import shutil
 from dfttopif.parsers import VaspParser
 from dfttopif.parsers import PwscfParser
+from dfttopif.parsers import GpawParser
 from dfttopif.parsers.base import InvalidIngesterException
 from pypif.obj import *
 import json
@@ -117,7 +118,7 @@ def files_to_pif(files, verbose=0, quality_report=True, inline=True):
 
     # Look for the first parser compatible with the directory
     found_parser = False
-    for possible_parser in [PwscfParser, VaspParser]:
+    for possible_parser in [PwscfParser, VaspParser, GpawParser]:
         try:
             parser = possible_parser(files)
             found_parser = True
