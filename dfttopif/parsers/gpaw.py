@@ -59,7 +59,9 @@ class GpawParser(DFTParser):
         def _write_temp_asedb(self):
             '''Reads designated output file and writes it to a temporary ase db '''
             atoms = read(self.outputf)
-            temp_db = ase.db.connect('temp_db.db')
+            if os.path.exists('cit_temp_db.db'):
+                os.remove('cit_temp_db.db')
+            temp_db = ase.db.connect('cit_temp_db.db')
             temp_db.write(atoms)
             return temp_db
 
