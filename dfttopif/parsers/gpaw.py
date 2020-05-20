@@ -55,6 +55,8 @@ class GpawParser(DFTParser):
 
             self.output_type='txt'
 
+        self.atoms = read(self.outputf)
+
         # Use ase db functionality to read in data to temporary ase db
         def _write_temp_asedb(self):
             '''
@@ -63,11 +65,10 @@ class GpawParser(DFTParser):
             Checks to see if cit_temp_db.db already exists, and overwrites it if it does.
 
             '''
-            atoms = read(self.outputf)
             if os.path.exists('cit_temp_db.db'):
                 os.remove('cit_temp_db.db')
             temp_db = ase.db.connect('cit_temp_db.db')
-            temp_db.write(atoms)
+            temp_db.write(self.atoms)
             return temp_db
 
         self.temp_db = _write_temp_asedb()
@@ -168,13 +169,7 @@ class GpawParser(DFTParser):
 
     def get_output_structure(self):
         ''' Returns ase Atoms object containing only symbols, cell, pbc, and coordinates'''
-        sym = self.temp_db.get(id=1).symbols
-        cell = self.temp_db.get(id=1).cell
-        pbc = self.temp_db.get(id=1).pbc
-        coords = self.temp_db.get(id=1).positions
-        struct = Atoms(symbols=sym,cell=cell,pbc=pbc)
-        struct.set_positions(coords)
-        return struct
+        return self.atoms
 
     def get_name(self): return "GPAW"
 
