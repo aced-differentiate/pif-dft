@@ -15,8 +15,6 @@ class GpawParser(DFTParser):
     '''
     def __init__(self, files):
         super(GpawParser, self).__init__(files)
-        self.settings = {}
-        self.all_parsed_data = {}
 
     # Look for ase traj files
         def _find_traj():
@@ -66,6 +64,7 @@ class GpawParser(DFTParser):
             return temp_db
 
         self.temp_db = _write_temp_asedb()
+        self.settings = self.temp_db.get(id=1).calculator_parameters
 
         # Get mode for calculation
         self.calc_mode = get_mode()
@@ -87,7 +86,7 @@ class GpawParser(DFTParser):
 
         '''
         try:
-            mode=self.temp_db.get(id=1).calculator_parameters['mode']['name']
+            mode=self.settings['mode']['name']
         except KeyError:
             mode = 'fd'
         return mode
@@ -102,7 +101,7 @@ class GpawParser(DFTParser):
         '''
         if self.calc_mode == 'fd':
             try:
-                h = self.temp_db.get(id=1).calculator_parameters['h']
+                h = self.settings['h']
             except KeyError:
                 h = 0.2
             return Value(scalars=[Scalar(value=h)],units='angstrom')
@@ -115,7 +114,7 @@ class GpawParser(DFTParser):
 
         '''
         try:
-            xc = self.temp_db.get(id=1).calculator_parameters['xc']
+            xc = self.settings['xc']
         except KeyError:
             xc = 'LDA'
         return Value(scalars=[Scalar(value=xc)])
@@ -128,7 +127,7 @@ class GpawParser(DFTParser):
         '''
         if self.calc_mode == 'pw':
             try:
-                ecut = self.temp_db.get(id=1).calculator_parameters['mode']['ecut']
+                ecut = self.settings['mode']['ecut']
             except KeyError:
                 ecut = 340.0
             return Value(scalars=[Scalar(value=ecut)],units='eV')
@@ -141,7 +140,7 @@ class GpawParser(DFTParser):
 
         '''
         try:
-            kp = self.temp_db.get(id=1).calculator_parameters['kpts']
+            kp = self.settings['kpts']
         except KeyError:
             kp = np.array([0.])
         natoms = self.temp_db.get(id=1).natoms
@@ -149,7 +148,7 @@ class GpawParser(DFTParser):
 
     def get_total_magnetization(self):
         try:
-            spin = self.temp_db.get(id=1).calculator_parameters['spinpol']
+            spin = self.settings['spinpol']
         except KeyError:
             return None
         if spin:
