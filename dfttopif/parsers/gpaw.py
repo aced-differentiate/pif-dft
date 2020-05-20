@@ -173,6 +173,8 @@ class GpawParser(DFTParser):
 
     def get_name(self): return "GPAW"
 
+    def get_version_number(self): return None
+
     def get_outcar(self):
         return None
 
