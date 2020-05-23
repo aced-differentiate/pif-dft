@@ -173,6 +173,20 @@ class GpawParser(DFTParser):
         ''' Returns ase Atoms object containing only symbols, cell, pbc, and coordinates'''
         return self.atoms
 
+# Begin function placeholders
+
+    @Value_if_true
+    def is_relaxed(self): return None
+
+    @Value_if_true
+    def uses_SOC(self): return None
+
+    def get_pp_name(self): return None
+
+    def get_U_settings(self): return None
+
+    def get_vdW_settings(self): return None
+
     def get_name(self): return "GPAW"
 
     def get_version_number(self): return None
@@ -186,6 +200,23 @@ class GpawParser(DFTParser):
     def get_poscar(self):
         return None
 
+    def is_converged(self): return None
+
+    def get_band_gap(self): return None
+
+    def get_pressure(self): return None
+
+    def get_dos(self): return None
+
+    def get_forces(self): return None
+
+    def get_density(self): return None
+
+    def get_stresses(self): return None
+
+    def get_initial_volume(self): return None
+
+    def get_final_volume(self): return None
 
     def _get_line(self, search_string, search_file, return_string=True, case_sens=True):
         '''Return the first line containing a set of strings in a file.
