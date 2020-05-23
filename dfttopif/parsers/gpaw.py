@@ -74,6 +74,24 @@ class GpawParser(DFTParser):
         self.temp_db = _write_temp_asedb()
         self.settings = self.temp_db.get(id=1).calculator_parameters
 
+
+        def get_mode():
+            '''Determine calculation mode used.
+
+            Default value pulled from https://wiki.fysik.dtu.dk/gpaw/documentation/manual.html on May 18, 2020
+
+
+            Returns:
+               String, Possibilities are 'fd' (finite difference real space grid), 'lcao', 'pw' (plane-wave)
+
+            '''
+            try:
+                mode=self.settings['mode']['name']
+            except KeyError:
+                mode = 'fd'
+            return mode
+
+
         # Get mode for calculation
         self.calc_mode = get_mode()
 
@@ -82,22 +100,6 @@ class GpawParser(DFTParser):
         '''Determine total energy from the temporary ase db'''
         ener = self.temp_db.get(id=1).energy
         return Property(scalars=[Scalar(value=ener)], units='eV')
-
-    def get_mode(self):
-        '''Determine calculation mode used.
-
-        Default value pulled from https://wiki.fysik.dtu.dk/gpaw/documentation/manual.html on May 18, 2020
-
-
-        Returns:
-           String, Possibilities are 'fd' (finite difference real space grid), 'lcao', 'pw' (plane-wave)
-
-        '''
-        try:
-            mode=self.settings['mode']['name']
-        except KeyError:
-            mode = 'fd'
-        return mode
 
     def get_grid_spacing(self):
         '''Determine grid spacing from the temporary ase db
