@@ -58,7 +58,7 @@ class GpawParser(DFTParser):
         self.atoms = read(self.outputf)
 
         # Use ase db functionality to read in data to temporary ase db
-        def _write_temp_asedb(self):
+        def _write_temp_asedb():
             '''
 
             Reads designated output file and writes it to a temporary ase db.
