@@ -3,3 +3,4 @@
 build
 dist
 CitrinationClient.egg*
+cit_temp_db.db
