@@ -2,3 +2,4 @@
 
 from .vasp import VaspParser
 from .pwscf import PwscfParser
+from .gpaw import GpawParser
