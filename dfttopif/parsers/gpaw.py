@@ -170,7 +170,7 @@ class GpawParser(DFTParser):
         return None
 
     def get_output_structure(self):
-        ''' Returns ase Atoms object containing only symbols, cell, pbc, and coordinates'''
+        ''' Returns ase Atoms object'''
         return self.atoms
 
 
@@ -180,11 +180,15 @@ class GpawParser(DFTParser):
 
 
     def get_forces(self):
-#        return None
         all_forces = self.atoms.get_forces()
         wrapped = [[Scalar(value=x) for x in y] for y in all_forces]
         return Property(vectors=wrapped,units='eV/angstrom')
 
+
+    def get_max_force(self):
+        ''' Returns maximum force in the structure'''
+        max_f = self.temp_db.get(id=1).fmax
+        return Property(scalars=[Scalar(value=max_f)],units='eV/angstrom')
 
 # Begin function placeholders
 
