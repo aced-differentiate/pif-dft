@@ -176,7 +176,14 @@ class GpawParser(DFTParser):
 
     def get_final_volume(self):
         vol = self.atoms.get_cell().volume
-        return Property(scalars=[Scalar(value=vol)],units='angstrom')
+        return Property(scalars=[Scalar(value=vol)],units='angstrom^3')
+
+
+    def get_forces(self):
+#        return None
+        all_forces = self.atoms.get_forces()
+        wrapped = [[Scalar(value=x) for x in y] for y in all_forces]
+        return Property(vectors=wrapped,units='eV/angstrom')
 
 
 # Begin function placeholders
@@ -213,8 +220,6 @@ class GpawParser(DFTParser):
     def get_pressure(self): return None
 
     def get_dos(self): return None
-
-    def get_forces(self): return None
 
     def get_density(self): return None
 
