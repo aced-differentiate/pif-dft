@@ -153,7 +153,7 @@ class GpawParser(DFTParser):
             kp = self.settings['kpts']
         except KeyError:
             kp = np.array([0.])
-        natoms = self.temp_db.get(id=1).natoms
+        natoms = len(self.atoms)
         return Value(scalars=[Scalar(value=kp.prod()*natoms)])
 
     def get_total_magnetization(self):
