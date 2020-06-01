@@ -163,7 +163,7 @@ class GpawParser(DFTParser):
             return None
         if spin:
             try:
-                tot_mag = self.temp_db.get(id=1).magmom
+                tot_mag = self.atoms.get_magnetic_moment()
             except KeyError:
                 return None
             return Property(scalars=[Scalar(value=tot_mag)],units='Bohr')
