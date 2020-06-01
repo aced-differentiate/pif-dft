@@ -222,7 +222,8 @@ class GpawParser(DFTParser):
 
     def get_initial_volume(self): return None
 
-    def get_final_volume(self): return None
+
+# End function placeholders
 
     def _get_line(self, search_string, search_file, return_string=True, case_sens=True):
         '''Return the first line containing a set of strings in a file.
