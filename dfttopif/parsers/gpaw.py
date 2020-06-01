@@ -173,6 +173,12 @@ class GpawParser(DFTParser):
         ''' Returns ase Atoms object containing only symbols, cell, pbc, and coordinates'''
         return self.atoms
 
+
+    def get_final_volume(self):
+        vol = self.atoms.get_cell().volume
+        return Property(scalars=[Scalar(value=vol)],units='angstrom')
+
+
 # Begin function placeholders
 
     @Value_if_true
