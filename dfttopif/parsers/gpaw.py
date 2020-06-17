@@ -190,10 +190,12 @@ class GpawParser(DFTParser):
         max_f = self.temp_db.get(id=1).fmax
         return Property(scalars=[Scalar(value=max_f)],units='eV/angstrom')
 
-# Begin function placeholders
-
     @Value_if_true
-    def is_relaxed(self): return None
+    def is_relaxed(self):
+        '''Determine if relaxation run by checking if more than one image present'''
+        return len(read(self.outputf,index=':')) > 1
+
+# Begin function placeholders
 
     @Value_if_true
     def uses_SOC(self): return None
