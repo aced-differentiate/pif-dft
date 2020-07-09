@@ -50,8 +50,13 @@ class VaspParser(DFTParser):
         self.doscar = _find_file('DOSCAR')
         self.eignval = _find_file('EIGNVAL')
 
+    def get_result_functions(self):
+        base_results = super(PwscfParser, self).get_result_functions()
+        base_results["OUTCAR"] = "get_outcar"
+        return base_results
+
     def get_name(self): return "VASP"
-        
+
     def get_output_structure(self):
         self.atoms = read_vasp_out(self.outcar)
         return self.atoms

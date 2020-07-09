@@ -104,7 +104,6 @@ class DFTParser(object):
             'Forces': 'get_forces',
             'Total force': 'get_total_force',
             'Density': 'get_density',
-            'OUTCAR': 'get_outcar',
             'Total magnetization': 'get_total_magnetization',
             'Stresses': 'get_stresses',
             'Number of atoms': 'get_number_of_atoms',
