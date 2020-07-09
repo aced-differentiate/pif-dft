@@ -54,6 +54,7 @@ class VaspParser(DFTParser):
         base_settings = super(PwscfParser, self).get_setting_functions()
         base_settings["Cutoff Energy"] = "get_cutoff_energy"
         base_settings["Pseudopotentials"] = "get_pp_name"
+        base_settings["Spin-Orbit Coupling"] = "uses_SOC"
         base_settings["INCAR"] = "get_incar"
         base_settings["POSCAR"] = "get_poscar"
         return base_settings

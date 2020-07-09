@@ -77,7 +77,6 @@ class DFTParser(object):
             'XC Functional': 'get_xc_functional',
             'Relaxed': 'is_relaxed',
             'k-Points per Reciprocal Atom': 'get_KPPRA',
-            'Spin-Orbit Coupling': 'uses_SOC',
             'DFT+U': 'get_U_settings',
             'vdW Interactions': 'get_vdW_settings',
         }
