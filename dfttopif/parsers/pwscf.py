@@ -48,6 +48,12 @@ class PwscfParser(DFTParser):
                     else:
                         self.all_parsed_data[k] = [v]
 
+    def get_setting_functions(self):
+        base_settings = super(PwscfParser, self).get_setting_functions()
+        base_settings["Cutoff Energy"] = "get_cutoff_energy"
+        base_settings["Pseudopotentials"] = "get_pp_name"
+        return base_settings
+
     def get_result_functions(self):
         base_results = super(PwscfParser, self).get_result_functions()
         base_results["One-electron energy contribution"] = "get_one_electron_energy_contribution"
@@ -358,15 +364,6 @@ class PwscfParser(DFTParser):
         if "total force" not in self.settings:
             return None
         return Property(scalars=[Scalar(value=self.settings['total force'])], units=self.settings['force units'])
-
-    def get_outcar(self):
-        return None
-
-    def get_incar(self):
-        return None
-
-    def get_poscar(self):
-        return None
 
     def get_band_gap(self):
         '''Compute the band gap from the DOS'''

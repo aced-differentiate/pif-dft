@@ -50,6 +50,14 @@ class VaspParser(DFTParser):
         self.doscar = _find_file('DOSCAR')
         self.eignval = _find_file('EIGNVAL')
 
+    def get_setting_functions(self):
+        base_settings = super(PwscfParser, self).get_setting_functions()
+        base_settings["Cutoff Energy"] = "get_cutoff_energy"
+        base_settings["Pseudopotentials"] = "get_pp_name"
+        base_settings["INCAR"] = "get_incar"
+        base_settings["POSCAR"] = "get_poscar"
+        return base_settings
+
     def get_result_functions(self):
         base_results = super(PwscfParser, self).get_result_functions()
         base_results["OUTCAR"] = "get_outcar"
