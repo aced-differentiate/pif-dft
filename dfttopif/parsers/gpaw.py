@@ -75,7 +75,7 @@ class GpawParser(DFTParser):
         self.settings = self.temp_db.get(id=1).calculator_parameters
 
 
-        def get_mode():
+        def _get_mode():
             '''Determine calculation mode used.
 
             Default value pulled from https://wiki.fysik.dtu.dk/gpaw/documentation/manual.html on May 18, 2020
@@ -93,12 +93,13 @@ class GpawParser(DFTParser):
 
 
         # Get mode for calculation
-        self.calc_mode = get_mode()
+        self.calc_mode = _get_mode()
 
 
     def get_setting_functions(self):
-        base_settings = super(GPawParser, self).get_setting_functions()
+        base_settings = super(GpawParser, self).get_setting_functions()
         base_settings["Grid Spacing"] = "get_grid_spacing"
+        base_settings["Calculation Mode"] = "get_calc_mode"
         return base_settings
 
     def get_result_functions(self):
@@ -110,6 +111,17 @@ class GpawParser(DFTParser):
         '''Determine total energy from the temporary ase db'''
         ener = self.temp_db.get(id=1).energy
         return Property(scalars=[Scalar(value=ener)], units='eV')
+
+
+    def get_calc_mode(self):
+        '''Takes string of calc mode and converts it to a pif Value'''
+        m = self.calc_mode
+        if m == 'fd':
+            return Value(scalars=[Scalar(value='Finite Difference')])
+        elif m == 'lcao':
+            return Value(scalars=[Scalar(value='LCAO')])
+        elif m == 'pw':
+            return Value(scalars=[Scalar(value='Plane-Wave')])
 
     def get_grid_spacing(self):
         '''Determine grid spacing from the temporary ase db
