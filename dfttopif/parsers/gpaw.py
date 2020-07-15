@@ -75,6 +75,15 @@ class GpawParser(DFTParser):
         self.settings = self.temp_db.get(id=1).calculator_parameters
 
 
+        def get_setting_functions(self):
+            base_settings = super(GPawParser, self).get_setting_functions()
+            return base_settings
+
+        def get_result_functions(self):
+            base_results = super(GpawParser, self).get_result_functions()
+            return base_results
+
+
         def get_mode():
             '''Determine calculation mode used.
 
