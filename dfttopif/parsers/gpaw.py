@@ -75,16 +75,6 @@ class GpawParser(DFTParser):
         self.settings = self.temp_db.get(id=1).calculator_parameters
 
 
-        def get_setting_functions(self):
-            base_settings = super(GPawParser, self).get_setting_functions()
-            base_settings["Grid Spacing"] = "get_grid_spacing"
-            return base_settings
-
-        def get_result_functions(self):
-            base_results = super(GpawParser, self).get_result_functions()
-            return base_results
-
-
         def get_mode():
             '''Determine calculation mode used.
 
@@ -104,6 +94,16 @@ class GpawParser(DFTParser):
 
         # Get mode for calculation
         self.calc_mode = get_mode()
+
+
+    def get_setting_functions(self):
+        base_settings = super(GPawParser, self).get_setting_functions()
+        base_settings["Grid Spacing"] = "get_grid_spacing"
+        return base_settings
+
+    def get_result_functions(self):
+        base_results = super(GpawParser, self).get_result_functions()
+        return base_results
 
 
     def get_total_energy(self):
