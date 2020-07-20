@@ -96,6 +96,7 @@ class DFTParser(object):
             'Pressure': 'get_pressure',
             'Density of States': 'get_dos',
             'Positions': 'get_positions',
+            'Symbols': 'get_symbols',
             'Forces': 'get_forces',
             'Total force': 'get_total_force',
             'Density': 'get_density',
@@ -150,6 +151,15 @@ class DFTParser(object):
         raw = strc.positions.tolist()
         wrapped = [[Scalar(value=x) for x in y] for y in raw]
         return Property(vectors=wrapped)
+
+
+    def get_symbols(self):
+        ''' Returns list of chemical symbols corresponding to the positions order'''
+        strc = self.get_output_structure()
+        raw = list(strc.symbols)
+        wrapped = [Scalar(value=y) for y in raw]
+        return Property(scalars=wrapped)
+
 
     def get_cutoff_energy(self):
         '''Read the cutoff energy from the output
