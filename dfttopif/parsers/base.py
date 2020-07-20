@@ -97,6 +97,7 @@ class DFTParser(object):
             'Density of States': 'get_dos',
             'Positions': 'get_positions',
             'Symbols': 'get_symbols',
+            'Cell Vectors': 'get_cell_vecs',
             'Forces': 'get_forces',
             'Total force': 'get_total_force',
             'Density': 'get_density',
@@ -159,6 +160,14 @@ class DFTParser(object):
         raw = list(strc.symbols)
         wrapped = [Scalar(value=y) for y in raw]
         return Property(scalars=wrapped)
+
+
+    def get_cell_vecs(self):
+        ''' Returns three vectors that define the cell'''
+        strc = self.get_output_structure()
+        raw = list(strc.cell)
+        wrapped = [[Scalar(value=x) for x in y] for y in raw]
+        return Property(vectors=wrapped)
 
 
     def get_cutoff_energy(self):
