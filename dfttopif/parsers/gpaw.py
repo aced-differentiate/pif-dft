@@ -1,3 +1,5 @@
+import numpy as np
+
 from pypif.obj.common import Property, Scalar
 
 from .base import DFTParser, Value_if_true, InvalidIngesterException
@@ -176,7 +178,7 @@ class GpawParser(DFTParser):
         except KeyError:
             kp = np.array([0.])
         natoms = len(self.atoms)
-        return Value(scalars=[Scalar(value=kp.prod()*natoms)])
+        return Value(scalars=[Scalar(value=kp[0]*natoms)])
 
     def get_total_magnetization(self):
         try:
