@@ -6,9 +6,11 @@ from .base import DFTParser, Value_if_true, InvalidIngesterException
 import os
 from pypif.obj.common.value import Value
 
+from dftparse.gpaw.stdout_parser import GpawStdOutputParser
 from ase import Atoms
 from ase.io import read
 from ase.io.ulm import InvalidULMFileError
+from ase.calculators.calculator import PropertyNotImplementedError
 import ase.db
 
 class GpawParser(DFTParser):
@@ -17,47 +19,25 @@ class GpawParser(DFTParser):
     '''
     def __init__(self, files):
         super(GpawParser, self).__init__(files)
-
-        # Look for ase traj files
-        def _find_traj():
-            '''Searches for GPAW readable traj file and returns name '''
-            traj_file = None
-            for f in self._files:
-                if os.path.basename(f).split('.')[-1] == 'traj':
-                    try:
-                        test_traj_file = read(f, format='traj')
-                        if traj_file is not None:
-                            raise InvalidIngesterException('Found more than one valid traj file')
-                        traj_file = f
-                    except InvalidULMFileError:
-                        pass
-                    except OSError:
-                        pass
-            return traj_file
-
-        self.outputf = _find_traj()
-        self.output_type = 'traj'
+        self.computational_data = {}
+        self.output_traj = self._find_output("traj")
+        self.output_txt = self._find_output("txt")
+        parser = GpawStdOutputParser() 
 
 
+        if self.output_traj is not None:
+            self.atoms = read(self.output_traj)
+        elif self.output_txt is not None:
+            self.atoms = read(self.output_txt)
+        else:
+            raise InvalidIngesterException('Failed to find output file')
 
-        # Look for appropriate txt if no traj files
-        if self.outputf is None:
-            for f in self._files:
-                try:
-                    if self._get_line('gpaw', f, return_string=False, case_sens=False):
-                        if self.outputf is not None:
-                            raise InvalidIngesterException('More than one output file!')
-                        self.outputf = f
-                except UnicodeDecodeError as e:
-                    pass
 
-            # If still cannot find GPAW outputfile, raise exception
-            if self.outputf is None:
-                raise InvalidIngesterException('Failed to find output file')
+        if self.output_txt is not None:
+            with open(self.output_txt,"r") as f:
+                for line in parser.parse(f.readlines()):
+                    self.computational_data.update(line)
 
-            self.output_type='txt'
-
-        self.atoms = read(self.outputf)
 
         # Use ase db functionality to read in data to temporary ase db
         def _write_temp_asedb():
@@ -96,6 +76,35 @@ class GpawParser(DFTParser):
 
         # Get mode for calculation
         self.calc_mode = _get_mode()
+
+        # Look for ase traj files
+    def _find_output(self,fmt):
+        '''Searches for GPAW readable traj file and returns name '''
+        out_file = None
+        for f in self._files:
+            if os.path.basename(f) == "output." + fmt:
+                out_file = f
+            else:
+                if os.path.basename(f).split('.')[-1] == fmt:
+                    try:
+                        test_out_file = read(f)
+                        if out_file is not None:
+                            raise InvalidIngesterException('Found more than one valid {} file'.format(fmt))
+                        out_file = f
+                    except InvalidULMFileError:
+                        pass
+                    except OSError:
+                        pass
+        return out_file
+
+    def get_name(self): return "GPAW"
+
+    def get_version_number(self):
+        '''Determine the GPAW version number from the output'''
+        if self.output_txt is not None:
+            return self.computational_data["gpaw_version"]
+        else:
+            return None
 
 
     def get_setting_functions(self):
@@ -204,9 +213,12 @@ class GpawParser(DFTParser):
 
 
     def get_forces(self):
-        all_forces = self.atoms.get_forces()
-        wrapped = [[Scalar(value=x) for x in y] for y in all_forces]
-        return Property(vectors=wrapped,units='eV/angstrom')
+        try:
+            all_forces = self.atoms.get_forces()
+            wrapped = [[Scalar(value=x) for x in y] for y in all_forces]
+            return Property(vectors=wrapped,units='eV/angstrom')
+        except PropertyNotImplementedError:
+            return None
 
 
     def get_max_force(self):
@@ -217,7 +229,10 @@ class GpawParser(DFTParser):
     @Value_if_true
     def is_relaxed(self):
         '''Determine if relaxation run by checking if more than one image present'''
-        return len(read(self.outputf,index=':')) > 1
+        if self.output_traj is not None:
+            return len(read(self.output_traj,index=':')) > 1
+        else:
+            return len(read(self.output_txt,index=':')) > 1
 
 # Begin function placeholders
 
@@ -229,10 +244,6 @@ class GpawParser(DFTParser):
     def get_U_settings(self): return None
 
     def get_vdW_settings(self): return None
-
-    def get_name(self): return "GPAW"
-
-    def get_version_number(self): return None
 
     def is_converged(self): return None
 
