@@ -17,11 +17,13 @@ class TestGpawParser(unittest.TestCase):
         """Test that a static calculation is parseable"""
 
         # Parse the results
-        parser = self.get_parser("H2.txt")
+        parser = self.get_parser("H2")
 
         # Test the settings
         self.assertEquals("GPAW", parser.get_name())
         self.assertEquals("19.8.1", parser.get_version_number())
+
+        delete_example("H2")
 
 if __name__ == '__main__':
     unittest.main()
