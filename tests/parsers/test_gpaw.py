@@ -23,6 +23,27 @@ class TestGpawParser(unittest.TestCase):
         self.assertEquals("GPAW", parser.get_name())
         self.assertEquals("19.8.1", parser.get_version_number())
 
+        grid_spacing = parser.get_grid_spacing()
+        self.assertEquals(0.18, grid_spacing.scalars[0].value)
+        self.assertEquals("angstrom", grid_spacing.units)
+
+        xc = parser.get_xc_functional()
+        self.assertEquals("BEEF-vdW",xc.scalars[0].value)
+
+        calc_mode = parser.get_calc_mode()
+        self.assertEquals("Finite Difference",calc_mode.scalars[0].value)
+
+        # Test the results
+        energy = parser.get_total_energy()
+        self.assertAlmostEquals(-8.010749238310888,energy.scalars[0].value)
+        self.assertEquals("eV", energy.units)
+
+        # Test the structure
+        strc = parser.get_output_structure()
+        self.assertEquals(["H","H"], strc.get_chemical_symbols())
+        self.assertEquals("H2",parser.get_composition())
+        self.assertEquals(10.0, strc.cell[0][0])
+
         delete_example("H2")
 
 if __name__ == '__main__':
