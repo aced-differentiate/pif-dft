@@ -23,6 +23,9 @@ class TestGpawParser(unittest.TestCase):
         self.assertEquals("GPAW", parser.get_name())
         self.assertEquals("19.8.1", parser.get_version_number())
 
+        self.assertEquals("3.19.1", parser.get_ase_version())
+        self.assertEquals("3.0.0", parser.get_libxc_version())
+
         grid_spacing = parser.get_grid_spacing()
         self.assertEquals(0.18, grid_spacing.scalars[0].value)
         self.assertEquals("angstrom", grid_spacing.units)

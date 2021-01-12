@@ -114,9 +114,27 @@ class GpawParser(DFTParser):
         base_settings["Electron Smearing Width"] = "get_smearing_width"
         return base_settings
 
+    def get_additional_software_versions(self):
+        return {
+                'ASE': 'get_ase_version',
+                'LibXC': 'get_libxc_version'
+        }
+
     def get_result_functions(self):
         base_results = super(GpawParser, self).get_result_functions()
         return base_results
+
+    def get_ase_version(self):
+        if self.output_txt is not None:
+            return self.computational_data["ase_version"]
+        else:
+            return None
+
+    def get_libxc_version(self):
+        if self.output_txt is not None:
+            return self.computational_data["libxc_version"]
+        else:
+            return None
 
     def get_total_energy(self):
         '''Determine total energy from the temporary ase db'''

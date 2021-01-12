@@ -136,12 +136,17 @@ def files_to_pif(files, verbose=0, quality_report=True, inline=True):
     chem.chemical_formula = parser.get_composition()
         
     # Get software information, to list as method
-    software = Software(name=parser.get_name(),
-        version=parser.get_version_number())
-        
+    software = [Software(name=parser.get_name(),
+        version=parser.get_version_number())]
+
+    if parser.get_name() == "GPAW":
+        for name, func in parser.get_additional_software_versions().items():
+            version = getattr(parser,func)()
+            software.append(Software(name=name,version=version))
+
     # Define the DFT method object
     method = Method(name='Density Functional Theory',
-        software=[software])
+        software=software)
         
     # Get the settings (aka. "conditions") of the DFT calculations
     conditions = []
