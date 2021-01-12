@@ -106,23 +106,22 @@ class GpawParser(DFTParser):
         else:
             return None
 
-
     def get_setting_functions(self):
         base_settings = super(GpawParser, self).get_setting_functions()
         base_settings["Grid Spacing"] = "get_grid_spacing"
         base_settings["Calculation Mode"] = "get_calc_mode"
+        base_settings["Electron Smearing Function"] = "get_smearing_function"
+        base_settings["Electron Smearing Width"] = "get_smearing_width"
         return base_settings
 
     def get_result_functions(self):
         base_results = super(GpawParser, self).get_result_functions()
         return base_results
 
-
     def get_total_energy(self):
         '''Determine total energy from the temporary ase db'''
         ener = self.temp_db.get(id=1).energy
         return Property(scalars=[Scalar(value=ener)], units='eV')
-
 
     def get_calc_mode(self):
         '''Takes string of calc mode and converts it to a pif Value'''
@@ -189,6 +188,24 @@ class GpawParser(DFTParser):
         natoms = len(self.atoms)
         return Value(scalars=[Scalar(value=kp[0]*natoms)])
 
+    def get_smearing_function(self):
+        """Get function used for electron occupation smearing"""
+        try:
+            occ = self.settings["occupations"]
+        except KeyError:
+            return None
+        smearing_func = occ["name"]
+        return Value(scalars=[Scalar(value=smearing_func)])
+
+    def get_smearing_width(self):
+        """Get electron occupation smearing width"""
+        try:
+            occ = self.settings["occupations"]
+        except KeyError:
+            return None
+        width = occ["width"]
+        return Value(scalars=[Scalar(value=width)],units="eV")
+
     def get_total_magnetization(self):
         try:
             spin = self.settings['spinpol']
@@ -206,11 +223,9 @@ class GpawParser(DFTParser):
         ''' Returns ase Atoms object'''
         return self.atoms
 
-
     def get_final_volume(self):
         vol = self.atoms.get_cell().volume
         return Property(scalars=[Scalar(value=vol)],units='angstrom^3')
-
 
     def get_forces(self):
         try:
@@ -219,7 +234,6 @@ class GpawParser(DFTParser):
             return Property(vectors=wrapped,units='eV/angstrom')
         except PropertyNotImplementedError:
             return None
-
 
     def get_max_force(self):
         ''' Returns maximum force in the structure'''

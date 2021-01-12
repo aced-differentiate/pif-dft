@@ -33,6 +33,13 @@ class TestGpawParser(unittest.TestCase):
         calc_mode = parser.get_calc_mode()
         self.assertEquals("Finite Difference",calc_mode.scalars[0].value)
 
+        smear_func = parser.get_smearing_function()
+        self.assertEquals("fermi-dirac",smear_func.scalars[0].value)
+
+        smear_width = parser.get_smearing_width()
+        self.assertEquals(0.05,smear_width.scalars[0].value)
+        self.assertEquals("eV",smear_width.units)
+
         # Test the results
         energy = parser.get_total_energy()
         self.assertAlmostEquals(-8.010749238310888,energy.scalars[0].value)
