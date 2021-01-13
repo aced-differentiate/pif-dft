@@ -139,7 +139,7 @@ def files_to_pif(files, verbose=0, quality_report=True, inline=True):
     software = [Software(name=parser.get_name(),
         version=parser.get_version_number())]
 
-    if parser.get_name() == "GPAW":
+    if isinstance(parser, GpawParser):
         for name, func in parser.get_additional_software_versions().items():
             version = getattr(parser,func)()
             software.append(Software(name=name,version=version))
