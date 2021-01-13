@@ -1,6 +1,6 @@
 import numpy as np
 
-from pypif.obj.common import Property, Scalar
+from pypif.obj.common import Property, Scalar, Person
 
 from .base import DFTParser, Value_if_true, InvalidIngesterException
 import os
@@ -123,6 +123,11 @@ class GpawParser(DFTParser):
     def get_result_functions(self):
         base_results = super(GpawParser, self).get_result_functions()
         return base_results
+
+    def get_username(self):
+        if self.output_txt is not None:
+            user = self.computational_data["username"]
+            return Person(name=user)
 
     def get_ase_version(self):
         if self.output_txt is not None:

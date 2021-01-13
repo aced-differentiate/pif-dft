@@ -143,6 +143,7 @@ def files_to_pif(files, verbose=0, quality_report=True, inline=True):
         for name, func in parser.get_additional_software_versions().items():
             version = getattr(parser,func)()
             software.append(Software(name=name,version=version))
+        chem.contacts = [parser.get_username()]
 
     # Define the DFT method object
     method = Method(name='Density Functional Theory',
