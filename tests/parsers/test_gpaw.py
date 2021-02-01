@@ -83,6 +83,10 @@ class TestGpawParser(unittest.TestCase):
         self.assertEquals("H2",parser.get_composition())
         self.assertEquals(10.0, strc.cell[0][0])
 
+        # Test getting the setup files
+        pp = parser.get_pp_name()
+        self.assertEquals("/home/azeeshan/software/gpaw-setups-0.9.20000/H.PBE.gz",pp.scalars[0])
+
         delete_example("H2")
 
 if __name__ == '__main__':
