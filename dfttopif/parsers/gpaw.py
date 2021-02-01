@@ -20,6 +20,7 @@ class GpawParser(DFTParser):
     def __init__(self, files):
         super(GpawParser, self).__init__(files)
         self.computational_data = {}
+        self.all_parsed_data = {}
         self.output_traj = self._find_output("traj")
         self.output_txt = self._find_output("txt")
         parser = GpawStdOutputParser() 
@@ -37,6 +38,11 @@ class GpawParser(DFTParser):
             with open(self.output_txt,"r") as f:
                 for line in parser.parse(f.readlines()):
                     self.computational_data.update(line)
+                    for k, v in line.items():
+                        if k in self.all_parsed_data:
+                            self.all_parsed_data[k].append(v)
+                        else:
+                            self.all_parsed_data[k] = [v]
 
 
         # Use ase db functionality to read in data to temporary ase db
@@ -349,12 +355,18 @@ class GpawParser(DFTParser):
         else:
             return len(read(self.output_txt,index=':')) > 1
 
+    def get_pp_name(self):
+        '''Gets the PAW setup names'''
+        natomtypes = len(np.unique(self.get_output_structure().symbols))
+        ppnames = self.all_parsed_data["gpaw_setup_file"]
+        if len(ppnames) == natomtypes:
+            return Value(scalars=ppnames)
+        raise Exception('Could not find %i pseudopotential names'%natomtypes)
+
 # Begin function placeholders
 
     @Value_if_true
     def uses_SOC(self): return None
-
-    def get_pp_name(self): return None
 
     def get_U_settings(self): return None
 
