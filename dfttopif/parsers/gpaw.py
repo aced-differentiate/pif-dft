@@ -112,6 +112,7 @@ class GpawParser(DFTParser):
         base_settings["Calculation Mode"] = "get_calc_mode"
         base_settings["Electron Smearing Function"] = "get_smearing_function"
         base_settings["Electron Smearing Width"] = "get_smearing_width"
+        base_settings["Number of Cores"] = "get_ncores"
         return base_settings
 
     def get_additional_software_versions(self):
@@ -189,6 +190,11 @@ class GpawParser(DFTParser):
             return self.computational_data["libxc_version"]
         else:
             return None
+
+    def get_ncores(self):
+        if self.output_txt is not None:
+            ncores = float(self.computational_data["ncores"])
+            return Value(scalars=[Scalar(value=ncores)])
 
     def get_total_energy(self):
         '''Determine total energy from the temporary ase db'''
