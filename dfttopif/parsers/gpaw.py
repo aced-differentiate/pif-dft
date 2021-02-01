@@ -143,13 +143,15 @@ class GpawParser(DFTParser):
 
     def get_wf_initialization_timing(self):
         if self.output_txt is not None:
-            wf_time = float(self.computational_data["wf_initialization_time"])
-            return Property(scalars=[Scalar(value=wf_time)],units='s')
+            if "wf_initialization_time" in self.computational_data:
+                wf_time = float(self.computational_data["wf_initialization_time"])
+                return Property(scalars=[Scalar(value=wf_time)],units='s')
 
     def get_forces_timing(self):
         if self.output_txt is not None:
-            force_time = float(self.computational_data["forces_time"])
-            return Property(scalars=[Scalar(value=force_time)],units='s')
+            if "forces_time" in self.computational_data:
+                force_time = float(self.computational_data["forces_time"])
+                return Property(scalars=[Scalar(value=force_time)],units='s')
 
     def get_lcao_initialization_timing(self):
         if self.output_txt is not None:
