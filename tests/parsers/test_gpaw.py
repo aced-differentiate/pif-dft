@@ -25,6 +25,9 @@ class TestGpawParser(unittest.TestCase):
 
         self.assertEquals("3.19.1", parser.get_ase_version())
         self.assertEquals("3.0.0", parser.get_libxc_version())
+        self.assertEquals("3.7.7", parser.get_python_version())
+        self.assertEquals("1.18.1", parser.get_numpy_version())
+        self.assertEquals("1.4.1", parser.get_scipy_version())
 
         grid_spacing = parser.get_grid_spacing()
         self.assertEquals(0.18, grid_spacing.scalars[0].value)
@@ -43,10 +46,36 @@ class TestGpawParser(unittest.TestCase):
         self.assertEquals(0.05,smear_width.scalars[0].value)
         self.assertEquals("eV",smear_width.units)
 
+        ncores = parser.get_ncores()
+        self.assertEquals(8,ncores.scalars[0].value)
+
         # Test the results
         energy = parser.get_total_energy()
         self.assertAlmostEquals(-8.010749238310888,energy.scalars[0].value)
         self.assertEquals("eV", energy.units)
+
+        # Test the timing
+        total_timing = parser.get_total_timing()
+        self.assertAlmostEquals(501.283,total_timing.scalars[0].value)
+#        wf_time = parser.get_wf_initialization_timing()
+#        self.assertAlmostEquals()
+#        force_time = parser.get_forces_timing()
+#        self.assertAlmostEquals()
+        lcao_time = parser.get_lcao_initialization_timing()
+        self.assertAlmostEquals(1.018,lcao_time.scalars[0].value)
+        scf_time = parser.get_scf_cycle_timing()
+        self.assertAlmostEquals(464.621,scf_time.scalars[0].value)
+        other_time = parser.get_other_timing()
+        self.assertAlmostEquals(7.459,other_time.scalars[0].value)
+
+        # Test getting memory usage
+        mem = parser.get_memory_usage()
+        self.assertAlmostEquals(415.17,mem.scalars[0].value)
+        self.assertEquals(mem.units, "MiB")
+
+        # Test the run date
+        date = parser.get_run_date()
+        self.assertEquals("Fri Jan 8 21:28:12 2021",date.scalars[0].value)
 
         # Test the structure
         strc = parser.get_output_structure()
