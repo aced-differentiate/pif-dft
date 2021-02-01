@@ -128,6 +128,8 @@ class GpawParser(DFTParser):
         base_results["LCAO Initialization Time"] = "get_lcao_initialization_timing"
         base_results["SCF Cycle Time"] = "get_scf_cycle_timing"
         base_results["Other Time"] = "get_other_timing"
+        base_results["Memory Usage"] = "get_memory_usage"
+        base_results["Run Date"] = "get_run_date"
         return base_results
 
     def get_total_timing(self):
@@ -159,6 +161,17 @@ class GpawParser(DFTParser):
         if self.output_txt is not None:
             other_time = float(self.computational_data["other_time"])
             return Property(scalars=[Scalar(value=other_time)],units='s')
+
+    def get_memory_usage(self):
+        if self.output_txt is not None:
+            mem = self.computational_data["memory_usage"]
+            value,units = float(mem.split()[0]), mem.split()[1]
+            return Property(scalars=[Scalar(value=value)],units=units)
+
+    def get_run_date(self):
+        if self.output_txt is not None:
+            date = self.computational_data["run_date"]
+            return Property(scalars=[Scalar(value=date)])
 
     def get_username(self):
         if self.output_txt is not None:
