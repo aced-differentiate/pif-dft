@@ -122,7 +122,43 @@ class GpawParser(DFTParser):
 
     def get_result_functions(self):
         base_results = super(GpawParser, self).get_result_functions()
+        base_results["Total Time"] = "get_total_timing"
+        base_results["Wavefunction Initialization Time"] = "get_wf_initialization_timing"
+        base_results["Force Calculation Time"] = "get_forces_timing"
+        base_results["LCAO Initialization Time"] = "get_lcao_initialization_timing"
+        base_results["SCF Cycle Time"] = "get_scf_cycle_timing"
+        base_results["Other Time"] = "get_other_timing"
         return base_results
+
+    def get_total_timing(self):
+        if self.output_txt is not None:
+            tot_time = float(self.computational_data["total_time"])
+            return Property(scalars=[Scalar(value=tot_time)],units='s')
+
+    def get_wf_initialization_timing(self):
+        if self.output_txt is not None:
+            wf_time = float(self.computational_data["wf_initialization_time"])
+            return Property(scalars=[Scalar(value=wf_time)],units='s')
+
+    def get_forces_timing(self):
+        if self.output_txt is not None:
+            force_time = float(self.computational_data["forces_time"])
+            return Property(scalars=[Scalar(value=force_time)],units='s')
+
+    def get_lcao_initialization_timing(self):
+        if self.output_txt is not None:
+            lcao_time = float(self.computational_data["lcao_initialization_time"])
+            return Property(scalars=[Scalar(value=lcao_time)],units='s')
+
+    def get_scf_cycle_timing(self):
+        if self.output_txt is not None:
+            scf_time = float(self.computational_data["scf_cycle_time"])
+            return Property(scalars=[Scalar(value=scf_time)],units='s')
+
+    def get_other_timing(self):
+        if self.output_txt is not None:
+            other_time = float(self.computational_data["other_time"])
+            return Property(scalars=[Scalar(value=other_time)],units='s')
 
     def get_username(self):
         if self.output_txt is not None:
