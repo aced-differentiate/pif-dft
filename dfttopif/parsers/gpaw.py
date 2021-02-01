@@ -118,7 +118,10 @@ class GpawParser(DFTParser):
     def get_additional_software_versions(self):
         return {
                 'ASE': 'get_ase_version',
-                'LibXC': 'get_libxc_version'
+                'LibXC': 'get_libxc_version',
+                'Python': 'get_python_version',
+                'Numpy': 'get_numpy_version',
+                'SciPy': 'get_scipy_version'
         }
 
     def get_result_functions(self):
@@ -188,6 +191,24 @@ class GpawParser(DFTParser):
     def get_libxc_version(self):
         if self.output_txt is not None:
             return self.computational_data["libxc_version"]
+        else:
+            return None
+
+    def get_python_version(self):
+        if self.output_txt is not None:
+            return self.computational_data["python_version"]
+        else:
+            return None
+ 
+    def get_numpy_version(self):
+        if self.output_txt is not None:
+            return self.computational_data["numpy_version"]
+        else:
+            return None
+
+    def get_scipy_version(self):
+        if self.output_txt is not None:
+            return self.computational_data["scipy_version"]
         else:
             return None
 
