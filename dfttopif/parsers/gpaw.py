@@ -262,10 +262,14 @@ class GpawParser(DFTParser):
         Default value pulled from https://wiki.fysik.dtu.dk/gpaw/documentation/manual.html on May 18, 2020
 
         '''
-        try:
-            xc = self.settings['xc']
-        except KeyError:
-            xc = 'LDA'
+        if self.output_traj is not None:
+            if 'xc' in self.settings:
+                xc = self.settings['xc']
+        elif self.output_txt is not None:
+            if 'xc' in self.computational_data:
+                xc = self.computational_data["xc"]
+        else:
+            xc = "LDA"
         return Value(scalars=[Scalar(value=xc)])
 
     def get_cutoff_energy(self):
