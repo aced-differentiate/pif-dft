@@ -49,6 +49,9 @@ class TestGpawParser(unittest.TestCase):
         ncores = parser.get_ncores()
         self.assertEquals(8,ncores.scalars[0].value)
 
+        kppra = parser.get_KPPRA()
+        self.assertEquals(2.,kppra.scalars[0].value)
+
         # Test the results
         energy = parser.get_total_energy()
         self.assertAlmostEquals(-8.010749238310888,energy.scalars[0].value)
