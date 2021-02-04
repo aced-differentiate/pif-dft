@@ -292,12 +292,18 @@ class GpawParser(DFTParser):
         Default value pulled from https://wiki.fysik.dtu.dk/gpaw/documentation/manual.html on May 18, 2020
 
         '''
-        try:
-            kp = self.settings['kpts']
-        except KeyError:
-            kp = np.array([0.])
+        kp = None
+        if self.output_traj is not None:
+            if 'kpts' in self.settings:
+                kp = self.settings['kpts']
+        else:
+            if self.output_txt is not None:
+                if "mp_k_mesh" in self.computational_data:
+                    kp = self.computational_data['mp_k_mesh']
+        if kp is None:
+            kp = np.array([1.])
         natoms = len(self.atoms)
-        return Value(scalars=[Scalar(value=kp[0]*natoms)])
+        return Value(scalars=[Scalar(value=np.prod(kp)*natoms)])
 
     def get_smearing_function(self):
         """Get function used for electron occupation smearing"""
