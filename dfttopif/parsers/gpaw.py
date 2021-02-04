@@ -6,6 +6,8 @@ from .base import DFTParser, Value_if_true, InvalidIngesterException
 import os
 from pypif.obj.common.value import Value
 
+import tempfile
+
 from dftparse.gpaw.stdout_parser import GpawStdOutputParser
 from ase import Atoms
 from ase.io import read
@@ -19,7 +21,7 @@ class GpawParser(DFTParser):
     '''
     def __init__(self, files):
         super(GpawParser, self).__init__(files)
-        self.computational_data = {}
+        self.parsed_data = {}
         self.all_parsed_data = {}
         self.output_traj = self._find_output("traj")
         self.output_txt = self._find_output("txt")
@@ -37,31 +39,23 @@ class GpawParser(DFTParser):
         if self.output_txt is not None:
             with open(self.output_txt,"r") as f:
                 for line in parser.parse(f.readlines()):
-                    self.computational_data.update(line)
+                    self.parsed_data.update(line)
                     for k, v in line.items():
                         if k in self.all_parsed_data:
                             self.all_parsed_data[k].append(v)
                         else:
                             self.all_parsed_data[k] = [v]
 
+        tmp_dir = tempfile.TemporaryDirectory()
+        temp_db = ase.db.connect(os.path.join(tmp_dir.name,'cit_temp_db.db'))
+        temp_db.write(self.atoms)
 
-        # Use ase db functionality to read in data to temporary ase db
-        def _write_temp_asedb():
-            '''
-
-            Reads designated output file and writes it to a temporary ase db.
-            Checks to see if cit_temp_db.db already exists, and overwrites it if it does.
-
-            '''
-            if os.path.exists('cit_temp_db.db'):
-                os.remove('cit_temp_db.db')
-            temp_db = ase.db.connect('cit_temp_db.db')
-            temp_db.write(self.atoms)
-            return temp_db
-
-        self.temp_db = _write_temp_asedb()
-        self.settings = self.temp_db.get(id=1).calculator_parameters
-
+        self.tot_ener = temp_db.get(id=1).energy
+        self.settings = temp_db.get(id=1).calculator_parameters
+        try:
+            self.max_f = temp_db.get(id=1).fmax
+        except AttributeError:
+            pass
 
         def _get_mode():
             '''Determine calculation mode used.
@@ -108,7 +102,7 @@ class GpawParser(DFTParser):
     def get_version_number(self):
         '''Determine the GPAW version number from the output'''
         if self.output_txt is not None:
-            return self.computational_data["gpaw_version"]
+            return self.parsed_data["gpaw_version"]
         else:
             return None
 
@@ -144,90 +138,90 @@ class GpawParser(DFTParser):
 
     def get_total_timing(self):
         if self.output_txt is not None:
-            tot_time = float(self.computational_data["total_time"])
+            tot_time = float(self.parsed_data["total_time"])
             return Property(scalars=[Scalar(value=tot_time)],units='s')
 
     def get_wf_initialization_timing(self):
         if self.output_txt is not None:
-            if "wf_initialization_time" in self.computational_data:
-                wf_time = float(self.computational_data["wf_initialization_time"])
+            if "wf_initialization_time" in self.parsed_data:
+                wf_time = float(self.parsed_data["wf_initialization_time"])
                 return Property(scalars=[Scalar(value=wf_time)],units='s')
 
     def get_forces_timing(self):
         if self.output_txt is not None:
-            if "forces_time" in self.computational_data:
-                force_time = float(self.computational_data["forces_time"])
+            if "forces_time" in self.parsed_data:
+                force_time = float(self.parsed_data["forces_time"])
                 return Property(scalars=[Scalar(value=force_time)],units='s')
 
     def get_lcao_initialization_timing(self):
         if self.output_txt is not None:
-            lcao_time = float(self.computational_data["lcao_initialization_time"])
+            lcao_time = float(self.parsed_data["lcao_initialization_time"])
             return Property(scalars=[Scalar(value=lcao_time)],units='s')
 
     def get_scf_cycle_timing(self):
         if self.output_txt is not None:
-            scf_time = float(self.computational_data["scf_cycle_time"])
+            scf_time = float(self.parsed_data["scf_cycle_time"])
             return Property(scalars=[Scalar(value=scf_time)],units='s')
 
     def get_other_timing(self):
         if self.output_txt is not None:
-            other_time = float(self.computational_data["other_time"])
+            other_time = float(self.parsed_data["other_time"])
             return Property(scalars=[Scalar(value=other_time)],units='s')
 
     def get_memory_usage(self):
         if self.output_txt is not None:
-            mem = self.computational_data["memory_usage"]
+            mem = self.parsed_data["memory_usage"]
             value,units = float(mem.split()[0]), mem.split()[1]
             return Property(scalars=[Scalar(value=value)],units=units)
 
     def get_run_date(self):
         if self.output_txt is not None:
-            date = self.computational_data["run_date"]
+            date = self.parsed_data["run_date"]
             return Property(scalars=[Scalar(value=date)])
 
     def get_username(self):
         if self.output_txt is not None:
-            user = self.computational_data["username"]
+            user = self.parsed_data["username"]
             return Person(name=user)
 
     def get_ase_version(self):
         if self.output_txt is not None:
-            return self.computational_data["ase_version"]
+            return self.parsed_data["ase_version"]
         else:
             return None
 
     def get_libxc_version(self):
         if self.output_txt is not None:
-            return self.computational_data["libxc_version"]
+            return self.parsed_data["libxc_version"]
         else:
             return None
 
     def get_python_version(self):
         if self.output_txt is not None:
-            return self.computational_data["python_version"]
+            return self.parsed_data["python_version"]
         else:
             return None
  
     def get_numpy_version(self):
         if self.output_txt is not None:
-            return self.computational_data["numpy_version"]
+            return self.parsed_data["numpy_version"]
         else:
             return None
 
     def get_scipy_version(self):
         if self.output_txt is not None:
-            return self.computational_data["scipy_version"]
+            return self.parsed_data["scipy_version"]
         else:
             return None
 
     def get_ncores(self):
         if self.output_txt is not None:
-            ncores = float(self.computational_data["ncores"])
+            ncores = float(self.parsed_data["ncores"])
             return Value(scalars=[Scalar(value=ncores)])
 
     def get_total_energy(self):
         '''Determine total energy from the temporary ase db'''
-        ener = self.temp_db.get(id=1).energy
+        ener = self.tot_ener
         return Property(scalars=[Scalar(value=ener)], units='eV')
 
     def get_calc_mode(self):
@@ -266,8 +260,8 @@ class GpawParser(DFTParser):
             if 'xc' in self.settings:
                 xc = self.settings['xc']
         elif self.output_txt is not None:
-            if 'xc' in self.computational_data:
-                xc = self.computational_data["xc"]
+            if 'xc' in self.parsed_data:
+                xc = self.parsed_data["xc"]
         else:
             xc = "LDA"
         return Value(scalars=[Scalar(value=xc)])
@@ -298,8 +292,8 @@ class GpawParser(DFTParser):
                 kp = self.settings['kpts']
         else:
             if self.output_txt is not None:
-                if "mp_k_mesh" in self.computational_data:
-                    kp = self.computational_data['mp_k_mesh']
+                if "mp_k_mesh" in self.parsed_data:
+                    kp = self.parsed_data['mp_k_mesh']
         if kp is None:
             kp = np.array([1.])
         natoms = len(self.atoms)
@@ -354,7 +348,7 @@ class GpawParser(DFTParser):
 
     def get_max_force(self):
         ''' Returns maximum force in the structure'''
-        max_f = self.temp_db.get(id=1).fmax
+        max_f = self.max_f
         return Property(scalars=[Scalar(value=max_f)],units='eV/angstrom')
 
     @Value_if_true
